@@ -40,7 +40,7 @@ DD <n>
 
 przypisz(nazwa, wartosc) ::= <<
 <wartosc>
-MOV [<nazwa>], ST(0)
+POP [<nazwa>]
 >>
 
 inicjalizuj(nazwa, wartosc) ::= <<

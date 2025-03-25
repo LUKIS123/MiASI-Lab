@@ -52,10 +52,10 @@ public class EmitVisitor extends firstBaseVisitor<ST> {
         // return st.add("p1",visit(ctx.l)).add("p2",visit(ctx.r));
 
         Map<Integer, String> templateMap = Map.of(
-                firstParser.ADD, "dodaj",
-                firstParser.SUB, "odejmij",
                 firstParser.MUL, "mnoz",
-                firstParser.DIV, "dziel"
+                firstParser.DIV, "dziel",
+                firstParser.ADD, "dodaj",
+                firstParser.SUB, "odejmij"
         );
 
         String templateName = templateMap.get(ctx.op.getType());
@@ -64,30 +64,27 @@ public class EmitVisitor extends firstBaseVisitor<ST> {
         }
 
         ST st = stGroup.getInstanceOf(templateName);
-        st.add("p1", visit(ctx.l));
-        st.add("p2", visit(ctx.r));
+        st.add("p1", visit(ctx.l)).add("p2", visit(ctx.r));
         return st;
+    }
+
+    // nawiasy
+    @Override
+    public ST visitPars(firstParser.ParsContext ctx) {
+        return visit(ctx.expr());
     }
 
     // zmienne - deklaracja, inicjalizacja, przypisanie, wyłuskanie
     @Override
     public ST visitVar_def(firstParser.Var_defContext ctx) {
         ST st;
-        if (ctx.varVal != null) { // inicjalizacja zmiennej
+        if (ctx.varVal != null) {
+            // inicjalizacja zmiennej
             ST result = visit(ctx.varVal);
-            Integer val = null;
-
-            if (result != null) {
-                try {
-                    String render = result.render();
-                    val = Integer.valueOf(render);
-                } catch (NumberFormatException ignored) {
-                }
-            }
-
             st = stGroup.getInstanceOf("inicjalizuj");
-            st.add("nazwa", ctx.varName.getText()).add("wartosc", (val != null) ? val : result); // Jeśli nie liczba, używamy ST
-        } else { // deklaracja zmiennej
+            st.add("nazwa", ctx.varName.getText()).add("wartosc", result);
+        } else {
+            // deklaracja zmiennej
             st = stGroup.getInstanceOf("dek");
             st.add("n", ctx.varName.getText());
         }
@@ -100,11 +97,9 @@ public class EmitVisitor extends firstBaseVisitor<ST> {
         ST st = stGroup.getInstanceOf("przypisz");
 
         String varName = ctx.ID().getText(); // Pobieramy nazwę zmiennej
-
         ST visit = visit(ctx.expr());// Obliczamy wartość wyrażenia
-        String render = visit.render();
 
-        st.add("nazwa", varName).add("wartosc", render);
+        st.add("nazwa", varName).add("wartosc", visit);
         return st;
     }
 

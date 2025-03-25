@@ -13,9 +13,8 @@ block : stat #block_single
     | '{' block* '}' #block_real
     ;
 
-expr:
-    	l=expr op=(ADD|SUB) r=expr #binOp
-    |   l=expr op=(MUL|DIV) r=expr #binOp
+expr:   l=expr op=(MUL|DIV) r=expr #binOp
+    |	l=expr op=(ADD|SUB) r=expr #binOp
     |   NOT r=expr #unOp
     |   l=expr op=(EQ|NEQ|LESS|GREAT|GREATEQ|LESSEQ) r=expr #arOp
     |   l=expr op=(AND|OR) r=expr #arOp
