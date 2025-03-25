@@ -32,11 +32,14 @@ public class StartCompiler {
 
         //st group
 //        STGroup.trackCreationEvents = true;
-        STGroup group = new STGroupFile("src/compiler/pierwszy.stg");
+        STGroup group = new STGroupFile("src/compiler/stack.stg");
 
         EmitVisitor em = new EmitVisitor(group);
         ST res = em.visit(tree);
+
+        System.out.println("===================================\n");
         System.out.println(res.render());
+
         try {
             var wr = new FileWriter("wy.asm");
             wr.write(res.render());

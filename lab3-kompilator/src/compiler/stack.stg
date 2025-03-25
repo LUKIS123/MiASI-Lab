@@ -18,6 +18,36 @@ dodaj(p1,p2) ::= <<
 ADD
 >>
 
+odejmij(p1,p2) ::= <<
+<twoop(p1,p2)>
+SUB
+>>
+
+mnoz(p1,p2) ::= <<
+<twoop(p1,p2)>
+MUL
+>>
+
+dziel(p1,p2) ::= <<
+<twoop(p1,p2)>
+DIV
+>>
+
+
 dek(n) ::= <<
 DD <n>
+>>
+
+przypisz(nazwa, wartosc) ::= <<
+<wartosc>
+MOV [<nazwa>], ST(0)
+>>
+
+inicjalizuj(nazwa, wartosc) ::= <<
+<dek(n=nazwa)>
+<przypisz(nazwa,wartosc)>
+>>
+
+wyluskaj(nazwa) ::= <<
+PUSH [<nazwa>]
 >>
