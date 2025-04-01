@@ -1,0 +1,155 @@
+group pierwszy;
+
+deflt(elem) ::= <<
+    <elem; separator="\n">
+>>
+
+int(i) ::= <<
+MOV A,#<i>
+>>
+
+twoop(p1, p2) ::= <<
+<p2>
+PUSH A
+<p1>
+POP B
+>>
+
+dodaj(p1,p2) ::= <<
+<twoop(p1,p2)>
+ADD A,B
+>>
+
+odejmij(p1,p2) ::= <<
+<twoop(p1,p2)>
+SUB A,B
+>>
+
+mnoz(p1,p2) ::= <<
+<twoop(p1,p2)>
+MUL A,B
+>>
+
+dziel(p1,p2) ::= <<
+<twoop(p1,p2)>
+DIV A,B
+>>
+
+dek(n) ::= <<
+DD <n>
+>>
+
+przypisz(nazwa, wartosc) ::= <<
+<wartosc>
+MOV [<nazwa>],A
+>>
+
+inicjalizuj(nazwa, wartosc) ::= <<
+<dek(n=nazwa)>
+<przypisz(nazwa,wartosc)>
+>>
+
+wyluskaj(nazwa) ::= <<
+MOV A,[<nazwa>]
+PUSH A
+>>
+
+
+if_stat(cond, then, else_then, if_label_counter) ::= <<
+<cond>
+    JE label_else_<if_label_counter>
+<then>
+    JMP label_if_end_<if_label_counter>
+label_else_<if_label_counter>:
+<else_then>
+label_if_end_<if_label_counter>:
+>>
+
+// "CMP A,B", == -> z=0 , != -> z=1
+
+comp_operation(p1, p2, operationTemplate, compNumber) ::= <<
+<twoop(p1,p2)>
+CMP A,B
+<(operationTemplate)(p1, p2, compNumber)>
+>>
+comp_eq(p1, p2, compNumber) ::= <<
+JNE label_comp_<compNumber>
+MOV A,#1
+JMP label_comp_end_<compNumber>
+label_comp_<compNumber>:
+MOV A,#0
+label_comp_end_<compNumber>:
+>>
+comp_neq(p1, p2, compNumber) ::= <<
+JE label_comp_<compNumber>
+MOV A,#1
+JMP label_comp_end_<compNumber>
+label_comp_<compNumber>:
+MOV A,#0
+label_comp_end_<compNumber>:
+>>
+
+comp_less(p1,p2,compNumber)::= <<
+JG label_comp_<compNumber>
+MOV A,#1
+JMP label_comp_end_<compNumber>
+label_comp_<compNumber>:
+MOV A,#0
+label_comp_end_<compNumber>:
+>>
+comp_great(p1,p2,compNumber)::= <<
+JL label_comp_<compNumber>
+MOV A,#1
+JMP label_comp_end_<compNumber>
+label_comp_<compNumber>:
+MOV A,#0
+label_comp_end_<compNumber>:
+>>
+comp_less_eq(p1,p2,compNumber)::= <<
+JGE label_comp_<compNumber>
+MOV A,#1
+JMP label_comp_end_<compNumber>
+label_comp_<compNumber>:
+MOV A,#0
+label_comp_end_<compNumber>:
+>>
+comp_great_eq(p1,p2,compNumber)::= <<
+JLE label_comp_<compNumber>
+MOV A,#1
+JMP label_comp_end_<compNumber>
+label_comp_<compNumber>:
+MOV A,#0
+label_comp_end_<compNumber>:
+>>
+
+// funckje
+par(p) ::= <<
+<p>
+PUSH A
+>>
+// pars:par() - dla wszystkich parametrów wywołaj szablon o nazie par
+//func_call(name, pars, body, jump) ::= <<
+//<pars:par()>
+//<(jump)()>
+//>>
+parpop(p) ::= <<
+POP B
+>>
+func_call(name, pars) ::= <<
+<pars:par(); separator="\n">
+CALL <name>
+<pars:parpop(); separator="\n">
+>>
+// PUSH A PUSH B - pushe czegokolwiek żeby zrobić miejsce na stosie na zmienne
+func_def(name, pars, body) ::= <<
+<name>:
+PUSH BP
+MOV BP, SP
+
+PUSH A
+PUSH B
+
+<body>
+POP BP
+RET
+>>
